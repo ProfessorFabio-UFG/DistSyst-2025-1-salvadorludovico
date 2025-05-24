@@ -37,32 +37,46 @@
  */
 package example.hello;
 
-import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.RemoteException;
+import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.List;
 
 public class Server implements Hello {
 
     public Server() {}
 
     public String sayHello() {
-        return "Hello, world!";
+        return "Olá, RMI funcionando!";
+    }
+
+    public int add(List<Integer> numbers) {
+        return numbers.stream().mapToInt(Integer::intValue).sum();
+    }
+
+    public int subtract(List<Integer> numbers) {
+        return numbers.stream().reduce(0, (a, b) -> a - b);
+    }
+
+    public int multiply(List<Integer> numbers) {
+        return numbers.stream().reduce(1, (a, b) -> a * b);
+    }
+
+    public double divide(List<Integer> numbers) {
+        return numbers.stream().mapToDouble(Integer::doubleValue).reduce((a, b) -> a / b).orElse(0.0);
     }
 
     public static void main(String args[]) {
-
         try {
             Server obj = new Server();
             Hello stub = (Hello) UnicastRemoteObject.exportObject(obj, 0);
-
-            // Bind the remote object's stub in the registry
+            LocateRegistry.createRegistry(1099);
             Registry registry = LocateRegistry.getRegistry();
-            registry.bind("Hello", stub);
-
-            System.err.println("Server ready");
+            registry.rebind("Hello", stub);
+            System.out.println("Servidor pronto");
         } catch (Exception e) {
-            System.err.println("Server exception: " + e.toString());
+            System.err.println("Erro no servidor: " + e.toString());
             e.printStackTrace();
         }
     }

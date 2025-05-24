@@ -39,25 +39,57 @@ package example.hello;
 
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Client {
-
-    private Client() {}
-
     public static void main(String[] args) {
+        if (args.length < 1) {
+            System.out.println("Uso: java Client <host>");
+            return;
+        }
 
-        System.out.println("Initiating client");
-        
-        String host = (args.length < 1) ? null : args[0];
         try {
-            Registry registry = LocateRegistry.getRegistry(host);
-            System.out.println("Registry has been located");
+            Registry registry = LocateRegistry.getRegistry(args[0]);
             Hello stub = (Hello) registry.lookup("Hello");
-            System.out.println("Found server");
-            String response = stub.sayHello();
-            System.out.println("response: " + response);
+
+            Scanner sc = new Scanner(System.in);
+            System.out.println("=== Calculadora Remota ===");
+            System.out.println("Comandos: add, subtract, multiply, divide (ex: add 1 2 3)");
+            System.out.println("Digite 'exit' para sair.");
+
+            while (true) {
+                System.out.print("> ");
+                String line = sc.nextLine();
+                if (line.equalsIgnoreCase("exit")) break;
+
+                String[] parts = line.trim().split("\\s+");
+                String command = parts[0];
+                List<Integer> numbers = Arrays.stream(parts).skip(1)
+                        .map(Integer::parseInt).collect(Collectors.toList());
+
+                switch (command) {
+                    case "add":
+                        System.out.println("Resultado: " + stub.add(numbers));
+                        break;
+                    case "subtract":
+                        System.out.println("Resultado: " + stub.subtract(numbers));
+                        break;
+                    case "multiply":
+                        System.out.println("Resultado: " + stub.multiply(numbers));
+                        break;
+                    case "divide":
+                        System.out.println("Resultado: " + stub.divide(numbers));
+                        break;
+                    default:
+                        System.out.println("Comando desconhecido.");
+                }
+            }
+
         } catch (Exception e) {
-            System.err.println("Client exception: " + e.toString());
+            System.err.println("Erro no cliente: " + e.toString());
             e.printStackTrace();
         }
     }

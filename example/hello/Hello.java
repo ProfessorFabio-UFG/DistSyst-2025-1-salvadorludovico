@@ -39,7 +39,12 @@ package example.hello;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.List;
 
 public interface Hello extends Remote {
     String sayHello() throws RemoteException;
+    int add(List<Integer> numbers) throws RemoteException;
+    int subtract(List<Integer> numbers) throws RemoteException;
+    int multiply(List<Integer> numbers) throws RemoteException;
+    double divide(List<Integer> numbers) throws RemoteException;
 }
